@@ -1,0 +1,15 @@
+flask
+eel
+SpeechRecognition
+pyttsx3
+opencv-python
+face-recognition
+scikit-learn
+numpy
+pandas
+nltk
+transformers
+torch
+pyaudio
+textblob
+schedule
