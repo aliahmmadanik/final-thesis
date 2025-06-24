@@ -3,7 +3,6 @@ eel
 SpeechRecognition
 pyttsx3
 opencv-python
-face-recognition
 scikit-learn
 numpy
 pandas

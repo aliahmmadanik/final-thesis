@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eric AI Assistant</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <div class="logo">
+            <i class="fas fa-robot"></i>
+            <h1>Eric AI Assistant</h1>
+          </div>
+          <div class="user-info">
+            <div class="authentication-status" id="authStatus">
+              <i class="fas fa-user-slash"></i>
+              <span>Not Authenticated</span>
+            </div>
+            <button class="auth-btn" id="authBtn" onclick="startFaceAuth()">
+              <i class="fas fa-camera"></i>
+              Authenticate
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Face Authentication Modal -->
+        <div class="modal" id="faceAuthModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2>Face Authentication</h2>
+              <button class="close-btn" onclick="closeFaceAuth()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="camera-container">
+                <video id="cameraFeed" autoplay></video>
+                <canvas id="captureCanvas" style="display: none"></canvas>
+              </div>
+              <div class="auth-controls">
+                <button class="btn primary" onclick="authenticateWithFace()">
+                  <i class="fas fa-check"></i>
+                  Authenticate
+                </button>
+                <button class="btn secondary" onclick="showRegisterForm()">
+                  <i class="fas fa-user-plus"></i>
+                  Register New Face
+                </button>
+              </div>
+              <div
+                class="register-form"
+                id="registerForm"
+                style="display: none"
+              >
+                <input
+                  type="text"
+                  id="userName"
+                  placeholder="Enter your name"
+                />
+                <button class="btn primary" onclick="registerFace()">
+                  <i class="fas fa-save"></i>
+                  Register
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+          <div class="sidebar-content">
+            <!-- Voice Controls -->
+            <div class="voice-controls">
+              <h3><i class="fas fa-microphone"></i> Voice Control</h3>
+              <button
+                class="voice-btn"
+                id="voiceBtn"
+                onclick="toggleVoiceListening()"
+              >
+                <i class="fas fa-microphone"></i>
+                <span>Start Listening</span>
+              </button>
+              <div class="voice-status" id="voiceStatus">
+                <span>Voice: Inactive</span>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+              <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+              <button
+                class="action-btn"
+                onclick="sendQuickCommand('What do you remember about me?')"
+              >
+                <i class="fas fa-brain"></i>
+                My Memories
+              </button>
+              <button
+                class="action-btn"
+                onclick="sendQuickCommand('Show my upcoming events')"
+              >
+                <i class="fas fa-calendar"></i>
+                My Events
+              </button>
+              <button
+                class="action-btn"
+                onclick="sendQuickCommand('How am I feeling today?')"
+              >
+                <i class="fas fa-heart"></i>
+                My Emotions
+              </button>
+              <button
+                class="action-btn"
+                onclick="sendQuickCommand('Play some music')"
+              >
+                <i class="fas fa-music"></i>
+                Play Music
+              </button>
+            </div>
+
+            <!-- Emotion Display -->
+            <div class="emotion-display">
+              <h3><i class="fas fa-smile"></i> Current Emotion</h3>
+              <div class="emotion-indicator" id="emotionIndicator">
+                <div class="emotion-icon">😐</div>
+                <div class="emotion-text">Neutral</div>
+                <div class="emotion-confidence">70%</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Chat Interface -->
+        <section class="chat-interface">
+          <div class="chat-header">
+            <h2><i class="fas fa-comments"></i> Conversation with Eric</h2>
+            <div class="chat-controls">
+              <button class="btn secondary" onclick="clearChat()">
+                <i class="fas fa-trash"></i>
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+              <div class="message-avatar">
+                <i class="fas fa-robot"></i>
+              </div>
+              <div class="message-content">
+                <div class="message-text">
+                  Hello! I'm Eric, your AI assistant. How can I help you today?
+                </div>
+                <div class="message-time">Just now</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-container">
+            <div class="chat-input">
+              <input
+                type="text"
+                id="messageInput"
+                placeholder="Type your message or use voice..."
+              />
+              <button class="send-btn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Panel -->
+        <aside class="right-panel">
+          <!-- Upcoming Events -->
+          <div class="events-panel">
+            <h3><i class="fas fa-calendar-alt"></i> Upcoming Events</h3>
+            <div class="events-list" id="eventsList">
+              <div class="event-item">
+                <div class="event-time">Tomorrow 10:00 AM</div>
+                <div class="event-title">Example Meeting</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Memory Stats -->
+          <div class="memory-stats">
+            <h3><i class="fas fa-database"></i> Memory Stats</h3>
+            <div class="stat-item">
+              <span class="stat-label">Total Memories:</span>
+              <span class="stat-value" id="totalMemories">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Conversations:</span>
+              <span class="stat-value" id="totalConversations">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Events:</span>
+              <span class="stat-value" id="totalEvents">0</span>
+            </div>
+          </div>
+
+          <!-- Emotion History -->
+          <div class="emotion-history">
+            <h3><i class="fas fa-chart-line"></i> Emotion Trends</h3>
+            <div class="emotion-chart" id="emotionChart">
+              <!-- Emotion chart will be rendered here -->
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <!-- Notification Area -->
+      <div class="notification-area" id="notificationArea">
+        <!-- Notifications will appear here -->
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/voice.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
